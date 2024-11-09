@@ -9,7 +9,6 @@ const generateVerificationCode = () => {
 export async function POST(req: Request) {
 	try {
 		const { email } = await req.json();
-		console.log(email+"nothing is in it");
 
 		if (!email) {
 			return NextResponse.json({ error: 'Email is required' }, { status: 400 });

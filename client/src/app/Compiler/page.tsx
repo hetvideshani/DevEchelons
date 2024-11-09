@@ -22,7 +22,7 @@ const CompilerQue = () => {
         });
 
         const response = await res.json();
-        console.log(response);
+        console.error(response);
         if(response.message!=null)
             {
             setOutput("server error occured while running your code! Sorry.\n Error : " + response.message);
@@ -117,7 +117,6 @@ const CompilerQue = () => {
                                         <option value="rust">Rust</option>
                                         <option value="swift">Swift</option>
                                         <option value="typescript">Typescript</option>
-
                                     </select>
                                 </div>
                             </div>

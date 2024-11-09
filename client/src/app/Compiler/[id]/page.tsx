@@ -40,7 +40,6 @@ const CompilerQue = ({ params }: any) => {
 	});
 
 	useEffect(() => {
-		console.log("global email",global_email);		
 		setEmail(global_email);
 		if (params.id) {
 			setProblemId(params.id);
@@ -68,9 +67,7 @@ const CompilerQue = ({ params }: any) => {
 		const data = await fetch('/api/user/checkuser');
 		const res = await data.json();
 
-		console.log(res);
 		if (res.success) {
-			console.log("user data",res.data);
 			setUser(res.data);
 		}
 	}
@@ -87,7 +84,6 @@ const CompilerQue = ({ params }: any) => {
 		});
 
 		const response = await res.json();
-		console.log(response);
 		if (response.error) {
 			if (response.status == 405) {
 				setOutput("error occurred while running your code! Sorry.\n" + response.message + "\nTestcase : \n" + response.error.input + "\n" + response.error.output);

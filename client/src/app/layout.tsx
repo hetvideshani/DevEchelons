@@ -23,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <title>DevEchelons - A Perfect Coding Plateform</title>
         <link
           rel="stylesheet"
           type="text/css"

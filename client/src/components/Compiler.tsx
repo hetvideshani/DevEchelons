@@ -4,8 +4,6 @@ import { Tabs } from "./ui/tabs";
 import polygon1 from '../../public/assets/images/Polygon 1.png'
 
 export function Compiler() {
-
-
     const tabs = [
         {
             title: "C",

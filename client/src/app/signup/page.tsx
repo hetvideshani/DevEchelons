@@ -114,7 +114,7 @@ const SignUp = () => {
 		}
 	}, [active]);
 
-	
+
 
 	const checkUser = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -145,8 +145,6 @@ const SignUp = () => {
 
 			if (data.success) {
 				setGlobalEmail(email);
-				console.log(global_email);
-				console.log("User logged in successfully");
 				setLoader(false);
 				router.push("/otpverification");
 			} else {
@@ -154,7 +152,7 @@ const SignUp = () => {
 				setFormError({ ...formError, title: "lpassword", message: "Credentials are incorrect." });
 			}
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 		}
 	};
 
@@ -205,11 +203,8 @@ const SignUp = () => {
 				})
 			});
 			const data = await response.json();
-			console.log(data);
 			if (data.success) {
 				setGlobalEmail(email);
-				console.log(global_email);
-				console.log("User registered successfully");
 				setLoader(false);
 				router.push("/otpverification");
 			} else {
@@ -217,7 +212,6 @@ const SignUp = () => {
 				setLoader(false);
 			}
 		} catch (error) {
-			console.log(error);
 			setLoader(false);
 		}
 	};
@@ -336,7 +330,6 @@ const SignUp = () => {
 								setActive("third");
 							}
 							else {
-								console.log(signupUser);
 								if (signupUser.firstname === '') {
 									setFormError({ ...formError, title: "firstname", message: "Enter firstname" });
 								}
@@ -430,7 +423,6 @@ const SignUp = () => {
 								registerUser(e);
 							}
 							else {
-								console.log(signupUser);
 								if (signupUser.email === '') {
 									setFormError({ ...formError, title: "email", message: "Enter email" });
 								}

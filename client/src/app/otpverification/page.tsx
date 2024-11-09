@@ -1,11 +1,16 @@
-'use client';
+"use client";
 import React, { useRef, ChangeEvent, useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import '../../css/Otpverification.css';
 import { useRouter } from 'next/navigation';
 import { global_email } from '../globals';
 
-const OtpPage = ({isLogin = false}:{isLogin:boolean}) => {
+// Define the expected prop type
+interface OtpPageProps {
+    isLogin: boolean;
+}
+
+const OtpPage: React.FC<OtpPageProps> = ({ isLogin=false }) => {
     const router = useRouter();
     const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
     const [userEmail, setUserEmail] = useState("");
@@ -13,31 +18,16 @@ const OtpPage = ({isLogin = false}:{isLogin:boolean}) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log(global_email);
-        console.log("call thai gyu USEEFFECT");
         setUserEmail(global_email);
     }, []);
 
-    useEffect(()=>{
-        if (userEmail){
+    useEffect(() => {
+        if (userEmail) {
             generateOtp();
         }
-    },[userEmail]);
-
-    // const checkJwt = async () => {
-    //     const data = await fetch("/api/user/checkuser");
-    //     const res = await data.json();
-
-    //     if (res.success) {
-    //         setUserEmail(res.data.email);
-    //         return true;
-    //     }
-    //     setUserEmail(global_email);
-    //     return false;
-    // };
+    }, [userEmail]);
 
     const generateOtp = async () => {
-        console.log(userEmail);
         const res = await fetch("/api/user/sendmail", {
             method: "POST",
             headers: {
@@ -49,11 +39,10 @@ const OtpPage = ({isLogin = false}:{isLogin:boolean}) => {
         });
 
         const data = await res.json();
-        console.log(data);
         if (data.success) {
-            alert("OTP generated and saved to database successfully " + data.code);
+            alert("OTP generated and saved to database successfully.Note: we will display your otp because of under developement project." + data.code);
         } else {
-            alert(data.error);
+            console.error(data.error);
         }
     };
 
@@ -93,7 +82,7 @@ const OtpPage = ({isLogin = false}:{isLogin:boolean}) => {
         const data = await res.json();
         setLoading(false);
         if (data.success) {
-            if(isLogin){
+            if (isLogin) {
                 router.push("/dashboard");
             }
             router.push("/detailForm");

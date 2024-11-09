@@ -2,10 +2,9 @@
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import profile from '../../../public/assets/images/profile.jpg'
+import profileImage from '../../../public/assets/images/profile.jpg'
 import { useState, useEffect, useRef } from 'react';
 import '../../css/user.css';
-import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import Modal from "../../components/Modal";
 import StreakBoard from '@/components/Streak';
@@ -16,8 +15,9 @@ const Profile = ({ params }: any) => {
     const router = useRouter();
     const [isVisible, setIsVisible] = useState(false);
     const [bedge, setBedge] = useState(novice)
-    const [defaultImage, setDefaultImage] = useState(profile); // Set your default image path here
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [defaultImage, setDefaultImage] = useState(profileImage); // Set your default image path here
+    const [isOpen, setIsOpen] = useState(false);
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [user, setUser] = useState({
         firstname: "",
         lastname: "",
@@ -36,15 +36,9 @@ const Profile = ({ params }: any) => {
         },
         friends: [],
         social_media: {
-            portfolio: {
-                type: String,
-            },
-            linkedin: {
-                type: String,
-            },
-            github: {
-                type: String,
-            }
+            portfolio: "",
+            linkedin: "",
+            github: ""
         },
         address: {
             city: "",
@@ -54,14 +48,19 @@ const Profile = ({ params }: any) => {
             expiry_date: Date,
             isVerified: Boolean
         },
+        miscellaneous: {
+            companyName: " ",
+            user_language: "",
+            college: ""
+        },
         languages: [],
         solvedQuestion: [],
         notifications: null,
         history: []
     });
+    const [topLanguages, setTopLanguages] = useState<{ language: string; count: number }[]>([]);
     const [problems, setProblems] = useState([{ _id: null, level: "" }])
     const [recentProblemSolved, setRecentProblemSolved] = useState([]);
-    const [error, setError] = useState(null);
     const [solved, setSolved] = useState({
         total: 0,
         easy: 0,
@@ -85,12 +84,30 @@ const Profile = ({ params }: any) => {
             if (res.success) {
                 setUser(res.data);
                 setRecentProblemSolved(res.data.history);
+                setUploadedImage(res.data.image);
+                setTopLanguages(findTopSolvedLanguages(res.data.history));
             } else {
                 router.push('/signup');
             }
         } catch (error) {
             console.error("Error fetching user data:", error);
         }
+    }
+    const findTopSolvedLanguages = (history: any) => {
+        const languageCount = history.reduce((acc:any, problem:any) => {
+            if (problem.status === true) {
+                acc[problem.language] = (acc[problem.language] || 0) + 1;
+            }
+            return acc;
+        }, {});
+
+        const sortedLanguages = Object.entries(languageCount)
+            .map(([language, count]) => ({ language, count: count as number }))
+            .sort((a:any, b:any) => b.count - a.count);
+
+        const topLanguages = sortedLanguages.slice(0, 3);
+
+        return topLanguages;
     }
     const fetchProblems = async () => {
         try {
@@ -99,16 +116,14 @@ const Profile = ({ params }: any) => {
                 throw new Error('Failed to fetch problems');
             }
             const data = await response.json();
-            console.log(data.allProblems);
             setProblems(data.allProblems);
         } catch (error: any) {
-            setError(error.message);
+            console.error(error.message);
         }
     };
 
     const setProgress = async () => {
         await fetchProblems();
-        console.log("Progress ma aavyu");
         let hard = 0, medium = 0, easy = 0
 
         user.solvedQuestion.forEach(pro => {
@@ -124,17 +139,10 @@ const Profile = ({ params }: any) => {
         } else if (user.solvedQuestion.length > problems.length * 0.3) {
             setBedge(proficient)
         }
-        setPercent(solved.total * 100 / problems.length)
-        console.log(solved);
+        
+        setPercent(parseFloat((user.solvedQuestion.length * 100 / problems.length).toFixed(2)) || 0)
     }
 
-
-    const [isOpen, setIsOpen] = useState(false);
-    const [uploadedImage, setUploadedImage] = useState(null);
-
-    const handleImageSelect = (file: any) => {
-        setSelectedFile(file);
-    }
     const handleOpenModal = () => setIsOpen(true);
     const handleCloseModal = () => setIsOpen(false);
     const handleUpdateImage = (file: any) => {
@@ -144,7 +152,6 @@ const Profile = ({ params }: any) => {
         setIsVisible(!isVisible);
     };
     const circleRef = useRef<SVGCircleElement | null>(null);
-    // const percent = 75;
 
     useEffect(() => {
         const circle = circleRef.current;
@@ -166,11 +173,28 @@ const Profile = ({ params }: any) => {
                 <div className="bg-custom-dark-gray w-1/4 p-4 rounded shadow text-center h-full justify-center items-center">
                     <div className='text-custom-white'>
                         <div className='flex flex-col items-center'>
-                            {uploadedImage ? <Image src={uploadedImage} alt="Uploaded" className="uploaded" height="200" width="200" /> :
-                                <div className='w-20 h-20 rounded-full overflow-hidden mb-3'>
-                                    <Image src={defaultImage} className='w-full h-full object-cover' alt="profile" />
+                            {uploadedImage ? (
+                                <div className='w-20 h-20 rounded-full overflow-hidden mb-3 flex items-center justify-center'>
+                                    <Image
+                                        src={`/assets/images/avatar/${uploadedImage}`}
+                                        alt="Uploaded"
+                                        className="uploaded object-cover"
+                                        height="200"
+                                        width="200"
+                                        onError={() => setDefaultImage(profileImage)}
+                                    />
                                 </div>
-                            }
+                            ) : (
+                                <div className='w-20 h-20 rounded-full overflow-hidden mb-3'>
+                                    <Image
+                                        src={defaultImage}
+                                        className='w-full h-full object-cover'
+                                        alt="profile"
+                                        onError={() => setDefaultImage(profileImage)}
+                                    />
+                                </div>
+                            )}
+
                             <div className='mb-2'>
                                 <button className='text-[#06b6d4]' onClick={handleOpenModal}>Update Profile</button>
                             </div>
@@ -178,10 +202,9 @@ const Profile = ({ params }: any) => {
                                 isOpen={isOpen}
                                 onClose={handleCloseModal}
                                 onUpdateImage={handleUpdateImage}
+                                user_email={user.email}
                             />
-
                         </div>
-
                         <p className='text-xl font-semibold'>{user.username}</p>
                         <p className='text-sm mb-3'>
                             <i className="fa fa-map-marker me-2" aria-hidden="true"></i>
@@ -192,7 +215,7 @@ const Profile = ({ params }: any) => {
                         <div className='flex my-4 justify-between w-full'>
                             <div>
                                 <h1 className='text-xs font-light'>Programs</h1>
-                                <h1 className='text-cyan-500 font-bold text-xl'>33%</h1>
+                                <h1 className='text-cyan-500 font-bold text-xl'>{percent}</h1>
                             </div>
                             <div>
                                 <h1 className='text-xs font-light'>Connections</h1>
@@ -206,9 +229,9 @@ const Profile = ({ params }: any) => {
                         <button className='bg-cyan-500 w-full py-1 rounded-md mb-3' onClick={toggleVisibility}>Edit Profile</button>
                         <div className={!isVisible ? 'block border-t-2 border-gray-500 text-left pt-3' : 'hidden'}>
                             <h1><i className="fa fa-info-circle me-3" aria-hidden="true"></i>{user.description}</h1>
-                            <h1 className='mt-3'><i className="fa fa-building-o me-3" aria-hidden="true"></i>SpeelBound Infotech</h1>
-                            <h1 className='mt-3'><i className="fa fa-map-marker me-3" aria-hidden="true"></i>behind crystall mall, kalavad road, Jetpur</h1>
-                            <h1 className='mt-3'><i className="fa fa-link me-3" aria-hidden="true"></i>https://fashionflair.com</h1>
+                            <h1 className='mt-3'><i className="fa fa-building-o me-3" aria-hidden="true"></i>{user.miscellaneous.companyName}</h1>
+                            <h1 className='mt-3'><i className="fa fa-map-marker me-3" aria-hidden="true"></i>{user.address.city ?? "City"}, {user.address.country ?? "Country"}</h1>
+                            <h1 className='mt-3'><i className="fa fa-link me-3" aria-hidden="true"></i>{user.social_media.portfolio}</h1>
                         </div>
                         <form className={isVisible ? 'block text-left' : 'hidden'}>
                             <label className='block'>Name</label>
@@ -245,24 +268,18 @@ const Profile = ({ params }: any) => {
                                 <button className='bg-custom-gray px-3 rounded-md'>Cancel</button>
                             </div>
                         </form>
-                        <div className='border-t-2 border-gray-400 w-full text-left pt-3 mt-4'>
-                            <h1>Languages</h1>
-                            {user.languages.map((item) => {
+                        <div className='border-t-2 border-gray-400 w-full text-left text-base font-medium pt-3 mt-4'>
+                            <h1>Top Solved Languages</h1>
+                            {topLanguages.map((item) => {
                                 return <>
                                     <div className='flex justify-between overflow-hidden mt-3'>
-                                        <h1 className='bg-[#3e3e3e] px-4 py-1 rounded-full text-sm'>{item}</h1>
-                                        <h1 className='text-xs mt-2'><span className='font-bold me-2'>4</span>problems solved</h1>
+                                        <h1 className='bg-[#3e3e3e] px-2 rounded-full text-sm grid place-items-center'>{item.language}</h1>
+                                        <span className=''>
+                                            <h1 className='mt-1 text-xs flex justify-center items-center'><span className='font-bold me-1'>{item.count}</span>problems solved</h1>
+                                        </span>
                                     </div >
                                 </>
                             })}
-                            {/* <div className='flex justify-between mt-3'>
-                                <h1 className='bg-[#3e3e3e] px-4 py-1 rounded-full text-sm'>Python</h1>
-                                <h1 className='text-xs mt-2'><span className='font-bold me-2'>4</span>problems solved</h1>
-                            </div>
-                            <div className='flex justify-between mt-3'>
-                            <h1 className='bg-[#3e3e3e] px-4 py-1 rounded-full text-sm'>MySQL</h1>
-                            <h1 className='text-xs mt-2'><span className='font-bold me-2'>8</span>problems solved</h1>
-                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -299,7 +316,7 @@ const Profile = ({ params }: any) => {
                                         textAnchor="middle"
                                         className="text-xl text-white font-semibold"
                                     >
-                                        {percent}%
+                                        25%
                                     </text>
 
                                 </svg>
@@ -333,7 +350,7 @@ const Profile = ({ params }: any) => {
                             {recentProblemSolved.map((obj: any, idx) => {
                                 if (obj.status) {
                                     return (
-                                        <div className='mb-1 px-2 py-[7px] rounded-lg' style={{ backgroundColor: idx % 2 == 0 ? '#282828' : 'transparent' }}>
+                                        <div className='mb-1 px-2 py-[7px] rounded-lg' style={{ backgroundColor: idx % 2 == 0 ? '#282828' : '#393939' }}>
                                             <h1>{obj.problem_title}</h1>
                                             <h1 className='ms-2 font-light text-sm'>{obj.language}</h1>
                                         </div>

@@ -37,7 +37,7 @@ export default function Footer() {
                 alert('Error while subscribing.');
             }
         } catch (error) {
-            alert('An error occurred during subscription.');
+            console.error('An error occurred during subscription.');
         }
     };
 

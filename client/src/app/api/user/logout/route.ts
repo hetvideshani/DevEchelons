@@ -7,14 +7,13 @@ export async function GET() {
     await dbConnect();
     try {
         const jwt = cookies().get("token");
-        if (!jwt) {
+        if (!jwt || jwt == undefined) {
             return NextResponse.json(
                 { success: false, message: 'User doesn\'t found with jwt.', data: false },
                 { status: 401 }
             );
         }
         const user = await UserModel.findOne({ token: jwt.value });
-        console.log(user)
         if (!user) {
             return NextResponse.json(
                 { success: false, message: 'User doesn\'t found with jwt.', data: false },

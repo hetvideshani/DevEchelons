@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import '../css/Modal.css';
 
-const Modal = ({ isOpen, onClose, onUpdateImage }:any) => {
+const Modal = ({ isOpen, onClose, onUpdateImage,user_email }:any) => {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState('');
@@ -27,6 +27,7 @@ const Modal = ({ isOpen, onClose, onUpdateImage }:any) => {
         if (file) {
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("email", user_email);
 
             try {
                 const response = await fetch('/api/user/upload-user-image', {

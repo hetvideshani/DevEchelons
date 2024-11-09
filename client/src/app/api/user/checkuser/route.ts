@@ -14,7 +14,6 @@ export async function GET() {
             );
         }
         const user = await UserModel.findOne({ token: jwt.value });
-        console.log(user)
         if (!user) {
             return NextResponse.json(
                 { success: false, message: 'User doesn\'t found with jwt.', data: false },

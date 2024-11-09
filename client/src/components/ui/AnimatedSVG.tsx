@@ -1,14 +1,14 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import '../../css/herosection.css'
-const AnimatedSVG = () => {
+const AnimatedSVG: React.FC = () => {
 
     return (
         <svg className='' width="100%" height="520" viewBox="0 0 510 549" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clip-path="url(#clip0_281_128)">
+            <g clipPath="url(#clip0_281_128)">
                 <g className="right-arrow-box">
                     <path className="" d="M245.535 527.205H199.092C189.103 527.205 181.007 519.117 181.007 509.139V462.748C181.007 452.77 189.103 444.683 199.092 444.683H245.535C255.523 444.683 263.621 452.77 263.621 462.748V509.139C263.621 519.115 255.524 527.205 245.535 527.205Z" fill="#E1E1E1"></path>
-                    <path d="M203.822 484.485L215.809 498.036L243.817 471.807" stroke="#7341e8" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" className=""></path>
+                    <path d="M203.822 484.485L215.809 498.036L243.817 471.807" stroke="#7341e8" strokeWidth="4" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" className=""></path>
                 </g>
                 <g className="second-serch-box second-serch-box-anim">
                     <path d="M137.21 504.1H87.0409C77.5857 504.1 69.9219 496.443 69.9219 486.998V436.885C69.9219 427.44 77.5875 419.783 87.0427 419.783H137.212C146.667 419.783 154.333 427.44 154.333 436.885V486.998C154.329 496.443 146.665 504.1 137.21 504.1Z" fill="#E1E1E1"></path>

@@ -1,22 +1,20 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { HeroParallax } from "./ui/hero-parallax";
 import Navbar from "./Navbar";
 import '../css/herosection.css';
-import { motion } from "framer-motion";
-import AnimatedSVG from "./ui/AnimatedSVG";
-import polygon1 from '../../public/assets/images/Polygon 1.png';
-import polygon2 from '../../public/assets/images/Polygon 2.png';
+import 'aos/dist/aos.css';
 import Image from 'next/image';
 import { useInView } from 'react-intersection-observer';
 import { Compiler } from './Compiler';
 import Footer from "./Footer";
-import 'aos/dist/aos.css';
-import AOS from 'aos';
+import polygon1 from '../../public/assets/images/Polygon 1.png';
+import polygon2 from '../../public/assets/images/Polygon 2.png';
 
-AOS.init({ duration: 3000 });
-
-const visible = { opacity: 1, y: 0, transition: { duration: 0.5 } };
+// Dynamically import AnimatedSVG and AOS (client-side only)
+const AnimatedSVG = dynamic(() => import("./ui/AnimatedSVG"), { ssr: false });
+import AOS from "aos";
 
 export function HeroSection() {
     const image1Ref = useRef<HTMLImageElement>(null);
@@ -31,10 +29,16 @@ export function HeroSection() {
     };
 
     useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
+        if (typeof window !== "undefined") {
+            // Initialize AOS animation
+            AOS.init({ duration: 3000 });
+
+            // Add scroll event listener
+            window.addEventListener('scroll', handleScroll);
+            return () => {
+                window.removeEventListener('scroll', handleScroll);
+            };
+        }
     }, []);
 
     useEffect(() => {
@@ -88,12 +92,11 @@ export function HeroSection() {
     );
 }
 
-
 export const products = [
     {
         title: "Moonbeam",
         link: "/",
-        thumbnail: "/assets/images/heroimage1.png",
+        thumbnail: "/assets/images/heroimg7.png",
     },
     {
         title: "Cursor",
@@ -128,41 +131,11 @@ export const products = [
     {
         title: "Aceternity UI",
         link: "https://ui.aceternity.com",
-        thumbnail: "/assets/images/heroimg5.png",
+        thumbnail: "/assets/images/heroimg6.png",
     },
     {
         title: "Tailwind Master Kit",
         link: "https://tailwindmasterkit.com",
-        thumbnail: "/assets/images/heroimg5.png",
-    },
-    {
-        title: "SmartBridge",
-        link: "https://smartbridgetech.com",
-        thumbnail: "https://aceternity.com/images/products/thumbnails/new/smartbridge.png",
-    },
-    {
-        title: "Renderwork Studio",
-        link: "https://renderwork.studio",
-        thumbnail: "https://aceternity.com/images/products/thumbnails/new/renderwork.png",
-    },
-    {
-        title: "Creme Digital",
-        link: "https://cremedigital.com",
-        thumbnail: "https://aceternity.com/images/products/thumbnails/new/cremedigital.png",
-    },
-    {
-        title: "Golden Bells Academy",
-        link: "https://goldenbellsacademy.com",
-        thumbnail: "https://aceternity.com/images/products/thumbnails/new/goldenbellsacademy.png",
-    },
-    {
-        title: "Invoker Labs",
-        link: "https://invoker.lol",
-        thumbnail: "https://aceternity.com/images/products/thumbnails/new/invoker.png",
-    },
-    {
-        title: "E Free Invoice",
-        link: "https://efreeinvoice.com",
-        thumbnail: "https://aceternity.com/images/products/thumbnails/new/efreeinvoice.png",
+        thumbnail: "/assets/images/heroimg4.png",
     },
 ];

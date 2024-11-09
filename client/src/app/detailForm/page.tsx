@@ -33,7 +33,7 @@ const DetailForm = () => {
             country: "",
         },
         miscellaneous: {
-            companyName: "",
+            companyName: " ",
             user_language: "",
             college: ""
         },
@@ -53,29 +53,6 @@ const DetailForm = () => {
             setFile(e.target.files[0]);
         }
     };
-
-
-    // const icons = [
-    //     'react',
-    //     'html5',
-    //     'node',
-    //     'css3-alt',
-    //     'flutter',
-    //     'code', // Representing Dart
-    //     'angular',
-    //     'cuttlefish', // Representing C
-    //     'java',
-    //     'js',
-    //     'js-square', // Representing JavaScript
-    //     'node-js', // Representing Express
-    //     'database', // Representing MongoDB
-    //     'table', // Representing SQL
-    //     'dot-circle', // Representing .NET
-    //     'php',
-    //     'next', // Assuming a placeholder for Next.js (replace with actual if available)
-    //     'python',
-    //
-    // ];
 
     const programmingLanguages = [
         'JavaScript',
@@ -122,8 +99,8 @@ const DetailForm = () => {
     const getUser = async () => {
         let u = await fetch("/api/user/checkuser");
         let result = await u.json();
-        console.log(result.data);
         setUser(result.data);
+        
         setLanguageArray(result.data.languages);
     };
 
@@ -153,25 +130,19 @@ const DetailForm = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateUrl(user.social_media.portfolio)) {
-            console.log("Portfolio khoti chhe");
             return;
         }
         if (!validateSocialMediaUrl(user.social_media.linkedin)) {
-            console.log("Linkedin khotu chhe");
             return;
         }
         if (!validateSocialMediaUrl(user.social_media.github)) {
-            console.log("github khotu chhe.")
             return;
         }
         if (!validateUrl(user.social_media.other)) {
-            console.log("other link khoti chhe");
             return;
         }
 
         user.languages = languageArray;
-
-        console.log('Form submitted', user);
 
         const res = await fetch('/api/user/signup', {
             method: 'PUT',
@@ -181,14 +152,12 @@ const DetailForm = () => {
             body: JSON.stringify(user),
         });
         let result = await res.json();
-        console.log(result);
         if (result.success) {
             router.push(`/${user.username}`);
         }
     };
 
     const deleteLang = (index: number) => {
-        console.log();
         languageArray.splice(index, 1);
         setLanguageArray([...languageArray]);
     };
@@ -219,7 +188,7 @@ const DetailForm = () => {
 
     const handleFileSubmit = async (event: any) => {
         event.preventDefault();
-
+        
         if (!file) {
             setMessage('No file selected');
             return;
@@ -247,11 +216,9 @@ const DetailForm = () => {
             });
 
             const result = await response.json();
-            console.log(result);
             setMessage(result.message);
             let index = result.filePath.indexOf('avatar');
             let fileLocation = result.filePath.substring(index + 7);
-            console.log(fileLocation);
             setUser({ ...user, image: fileLocation });
         } catch (error) {
             console.error('Error uploading file:', error);
@@ -302,7 +269,7 @@ const DetailForm = () => {
                                     type='text'
                                     className='w-full block px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white-500 bg-transparent'
                                     placeholder='Company'
-                                    value={user.miscellaneous.companyName}
+                                    // value={user.miscellaneous.companyName}
                                     onChange={(e) => setUser({ ...user, miscellaneous: { ...user.miscellaneous, companyName: e.target.value } })}
                                 />
 
@@ -335,7 +302,7 @@ const DetailForm = () => {
                                     type='text'
                                     className='w-full block px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-white-500 bg-transparent'
                                     placeholder='College/University'
-                                    value={user.miscellaneous.college}
+                                    // value={user.miscellaneous.college}
                                     onChange={(e) => setUser({ ...user, miscellaneous: { ...user.miscellaneous, college: e.target.value } })}
                                 />
                             </div>
@@ -424,7 +391,7 @@ const DetailForm = () => {
                                             className='absolute top-0 right-0 -mt-1 -mr-1 text-xs text-gray-300 hover:text-gray-400 focus:outline-none'
                                             onClick={() => deleteLang(index)}
                                         >
-                                            <i className="fa fa-times -translate-x-[8px] translate-y-[5px]"></i>
+                                            <i className="fa fa-times -translate-x-[8px] translate-y-[5px] ml-2"></i>
                                         </button>
                                     </div>
                                 </div>

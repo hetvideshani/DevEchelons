@@ -35,6 +35,12 @@ export async function POST(req: Request) {
 		};
 		const solvedQuestion: any = [];
 		const history: any = [];
+		const miscellaneous = {
+			college:"",
+			companyName:"",
+			user_language :""
+		}
+
 		const hashedPassword = await hash(password, 10);
 		//token creation code for jwt
 		const secretKey = process.env.SECRET_KEY;
@@ -42,7 +48,7 @@ export async function POST(req: Request) {
 			throw new Error('SECRET_KEY is not defined in environment variables');
 		}
 
-		const newUser = await UserModel.create({ firstname, lastname, username, password: hashedPassword, dob, mobile_number, email, image, description, streak, friends, social_media, address, verified, languages, solvedQuestion, history, verifyToken, verifyTokenExpiry });
+		const newUser = await UserModel.create({ firstname, lastname, username, password: hashedPassword, dob, mobile_number, email, image, description, streak, friends, social_media, address, verified, languages, solvedQuestion, history, verifyToken, verifyTokenExpiry, miscellaneous });
 
 		const token = jwt.sign({ _id: newUser._id }, secretKey, { expiresIn: '1h' });
 		newUser.token = token;
@@ -58,7 +64,7 @@ export async function POST(req: Request) {
 
 		return NextResponse.json({ success: true, message: "User created" }, { status: 201 });
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 
 		return NextResponse.json({
 			success: false,
@@ -134,7 +140,7 @@ export async function PUT(req: Request) {
 
 		return NextResponse.json({ success: true, message: "User updated" }, { status: 200 });
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 
 		return NextResponse.json({
 			success: false,

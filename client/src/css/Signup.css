@@ -144,6 +144,7 @@ input:focus~.highlight {
     animation-fill-mode: forwards;
     animation-delay: 1s;
 }
+
 /*loading wave animation*/
 .center {
     display: flex;

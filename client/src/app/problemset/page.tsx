@@ -3,10 +3,8 @@ import Navbar from '@/components/Navbar';
 import React, { useEffect, useState, useRef } from 'react';
 import '../../css/Problemset.css';
 import { useRouter } from 'next/navigation';
-import { global_email } from '../globals';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { Anybody } from 'next/font/google';
 
 const Problemset = () => {
     const router = useRouter();
@@ -39,7 +37,6 @@ const Problemset = () => {
         }
     };
 
-   
     const [problems, setProblems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -61,7 +58,6 @@ const Problemset = () => {
         fetchProblems();
     }, []);
 
-  
     const fetchProblems = async () => {
         try {
             const response = await fetch('/api/problem');
@@ -82,9 +78,7 @@ const Problemset = () => {
         const data = await fetch('/api/user/checkuser');
         const res = await data.json();
 
-        console.log(res);
         if (res.success) {
-            console.log(res.data);
             setUser(res.data);
         }
     }
@@ -93,9 +87,8 @@ const Problemset = () => {
         let n = Math.floor((Math.random() * (problems.length - 1)));
         //
         if (n >= 0 && n < problems.length) {
-            let problem: any = problems[n];
-            console.log(user);
-            if (user.solvedQuestion.includes(problem._id)) {
+            let problem:any = problems[n];
+            if (user.solvedQuestion.includes(problem?._id)) {
                 chooseRandom();
             }else{
                 router.push("/Compiler/" + problem.problem_id);
@@ -106,21 +99,20 @@ const Problemset = () => {
     }
 
     const filtering = (by: string, value: string) => {
-        console.log(filteredArr);
 
         let filtered = [];
         switch (by) {
             case 'difficulty':
-                filtered = problems.filter(problem => problem.level === value);
+                filtered = problems.filter((problem:any) => problem.level === value);
                 break;
             case 'category':
-                filtered = problems.filter(problem => problem.category.includes(value));
+                filtered = problems.filter((problem:any) => problem.category.includes(value));
                 break;
             case 'status':
                 if (value == 'solved') {
-                    filtered = problems.filter(problem => user.solvedQuestion.includes(problem._id))
+                    filtered = problems.filter((problem:any) => user.solvedQuestion.includes(problem._id))
                 } else {
-                    filtered = problems.filter(problem => !(user.solvedQuestion.includes(problem._id)))
+                    filtered = problems.filter((problem:any)=> !(user.solvedQuestion.includes(problem._id)))
                 }
                 break;
             default:

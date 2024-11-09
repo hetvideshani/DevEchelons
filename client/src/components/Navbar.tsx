@@ -18,7 +18,6 @@ export default function Navbar() {
         const data = await fetch('/api/user/checkuser');
         const res = await data.json();
 
-        console.log(res);
         if (res.success) {
             setUser({ ...user, email: res.data.email, username: res.data.username });
         }
@@ -27,9 +26,7 @@ export default function Navbar() {
     const logOutUser = async () => {
         const data = await fetch('/api/user/logout');
         const res = await data.json();
-
         if (res.success) {
-            console.log("User logout successfully");
             setUser({ email: '', username: '' });
         }
     }
@@ -45,9 +42,9 @@ export default function Navbar() {
         { name: 'Home', icon: 'fa fa-home', href: '/' },
         { name: 'Dashboard', icon: 'fa fa-tachometer', href: `/${user.email ? user.username : null}` },
         // { name: 'Components', icon: 'fa fa-clone', href: '#' },
-        { name: 'Playground', icon: 'fa-solid fa-keyboard', href: '#' },
+        { name: 'Playground', icon: 'fa-solid fa-keyboard', href: '/CodeEditor' },
         { name: 'Problemset', icon: 'fa fa-list', href: '/problemset' },
-        { name: 'Contact us', icon: 'fa fa-address-book', href: '#' },
+        { name: 'Contact us', icon: 'fa fa-address-book', href: '/aboutus' },
         { name: user.email ? 'Logout' : 'Login', icon: 'fa fa-sign-in', href: user.email ? '' : '/signup' },
         { name: user.email ? '' : 'Signup', icon: user.email ? '' : 'fa fa-user', href: user.email ? '' : '/signup' },
     ];

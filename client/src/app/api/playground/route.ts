@@ -5,83 +5,35 @@ import UserModel from '@/model/User';
 import dbConnect from "@/lib/dbConnect";
 import { setTimeout as sleep } from "timers/promises";
 
-interface ex {
-	input: string,
-	output: string
-}
 
 export async function POST(req: Request) {
-	let { code, language, submit, email } = await req.json();
-	const id = req.url.split("compiler/")[1];
-
-	if (!email) {
-		return NextResponse.json({ status: 406, error: "User is not authenticate.", message: "" });
-	}
+	let { code, language,input } = await req.json();
 
 	await dbConnect();
-	const problem = await ProblemModel.findOne({ problem_id: id });
-	let examples: any;
 
-	if (problem) {
-		examples = problem.examples;
-	} else {
-		return NextResponse.json({ status: 200, message: "nthi mlto object j" });
-	}
+    const data = await callapi(language, code,input);
 
-	let range;
-
-	if (submit == true) {
-		range = examples.length
-	} else {
-		range = 3
-	}
-
-	let user;
-	if (submit) user = await UserModel.findOne({ email: email });
-
-	for (let x: number = 0; x < range; x++) {
-		const data = await callapi(language, code, examples[x]);
-
-		if (data) {
+    if (data) {
 			if (data.status == 201) {
 				data.message = data.message.replace("\n", "");
-				if (data.message.toLowerCase() !== examples[x].output.toLowerCase()) {
-					if (submit) {
-						user.history.push({ problemID: problem.problem_id, problem_title: problem.problem_title, status: false, language: language, code: code })
-						await user.save();
-					}
-					return NextResponse.json({ status: 405, error: examples[x], message: `wrong output on test case ${x + 1}` });
-				}
+				return NextResponse.json({ status: 200, message: data.message });
 			}
 			else {
-				if (submit) {
-					user.history.push({ problemID: problem.problem_id, problem_title: problem.problem_title, status: false, language: language, code: code });
-					await user.save();
-				}
 				if (data.status == 401) {
 					return NextResponse.json({ status: 401, error: data.message, message: "" });
 				} else if (data.status == 402) {
 					return NextResponse.json({ status: 402, error: data.message, message: "" });
 				} else if (data.status == 403) {
 					return NextResponse.json({ status: 403, error: "Error While Fetching Data", message: "" });
-				}
+				}else if(data.status == 500){
+                    return NextResponse.json({ status: 500, error: "Internal Server Error", message: "" });
+                }
 			}
-		}
-
-		await sleep(2500);
 	}
-
-	if (submit) {
-
-		user.solvedQuestion.push(problem._id);
-		user.history.push({ problemID: problem.problem_id, problem_title: problem.problem_title, status: true, language: language, code: code });
-		await user.save();
-	}
-
-	return NextResponse.json({ status: 200, error: "", message: "Code Compiled successfully in all testcases." });
+    return NextResponse.json({ status: 500, error: "Internal Server Error", message: "" });
 }
 
-const callapi = async (language: string, code: string, ex: ex) => {
+const callapi = async (language: string, code: string, input:string) => {
 	let api: string = "https://emkc.org/api/v2/piston/execute";
 	let data;
 	if (language == "c" || language == "cpp") {
@@ -89,7 +41,7 @@ const callapi = async (language: string, code: string, ex: ex) => {
 		data = {
 			language: language,
 			code: code,
-			input: ex.input
+			input: input
 		};
 	} else {
 		const ver: keyof typeof LANGUAGE_VERSIONS = language;
@@ -101,7 +53,7 @@ const callapi = async (language: string, code: string, ex: ex) => {
 					content: code,
 				}
 			],
-			stdin: ex.input
+			stdin: input
 		};
 	}
 
@@ -111,6 +63,9 @@ const callapi = async (language: string, code: string, ex: ex) => {
 		body: JSON.stringify(data),
 	}).then(res => res.json());
 
+    if(response.status == 500){
+        return { status: 500, message: "Internal Server Error" }
+    }
 	if (language == 'c' || language == 'cpp') {
 		if (response.output !== "") {
 			return { status: 201, message: response.output }
